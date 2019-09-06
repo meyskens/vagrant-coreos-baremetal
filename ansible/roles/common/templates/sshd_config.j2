@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+
+ChallengeResponseAuthentication no
+UseDNS no
+UsePAM yes
+PermitRootLogin no
+X11Forwarding yes
+PrintMotd no
+PrintLastLog no
+AcceptEnv LANG LC_*
+Subsystem sftp /usr/lib/openssh/sftp-server
+ClientAliveInterval 180
+PasswordAuthentication no

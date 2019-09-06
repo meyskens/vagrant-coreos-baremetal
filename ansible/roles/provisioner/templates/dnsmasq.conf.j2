@@ -1,0 +1,12 @@
+{% for i in range(num_controllers) %}
+address=/controller-{{ i + 1 }}.k8s.box.srcd.local/192.168.1.{{ ((i | int) + 11 )| string }}
+{% endfor %}
+address=/matchbox.infra.box.srcd.local/192.168.1.1
+
+{% for i in range(num_controllers) %}
+ptr-record={{ ((i | int) + 10 )| string }}.1.168.192.in-addr.arpa,controller-{{ i + 1 }}.k8s.box.srcd.local
+{% endfor %}
+
+{% for i in range(num_controllers) %}
+dhcp-host=08:00:27:00:00:0{{ i + 1 }},192.168.1.{{ ((i | int) + 11 )| string }},controller-{{ i + 1 }}.k8s.box.srcd.local
+{% endfor %}

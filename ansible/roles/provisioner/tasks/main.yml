@@ -1,0 +1,23 @@
+---
+- hostname:
+    name: "{{ ansible_fqdn }}"
+
+- include_tasks: packages.yml
+  tags:
+    - packages
+
+- include_tasks: matchbox.yml
+  tags:
+    - matchbox
+
+- include_tasks: dnsmasq.yml
+  tags:
+    - dnsmasq
+
+- include_tasks: terraform.yml
+  tags:
+    - terraform
+
+- include_tasks: nat.yml
+  tags:
+    - nat

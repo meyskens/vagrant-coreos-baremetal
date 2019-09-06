@@ -1,0 +1,104 @@
+---
+# Remove local bind
+- name: Remove bind9
+  apt:
+    name: "{{ item }}"
+    state:  absent
+  with_items:
+    - bind9
+    - bind9utils
+
+# Remove systen dnsmasq unit file 
+- name: Remove systen dnsmasq unit file 
+  file:
+    state: absent
+    path: /lib/systemd/system/dnsmasq.service
+
+- name: Remove systen generator.late dnsmasq unit file 
+  file:
+    state: absent
+    path: /run/systemd/generator.late/dnsmasq.service
+
+- name: Disable systemd-resolved service
+  service:
+    name: systemd-resolved
+    state: stopped
+    enabled: no
+
+# To avoid having a local DNS resolver
+- name: copy resolved.conf
+  copy:
+    src: "{{ role_path }}/files/resolved.conf"
+    dest: /etc/systemd/resolved.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart systemd-resolved
+
+# This creates an empty file that will be filled with dns registers
+# created through terraform. Empty file is needed by dnsmasq unit
+# as it is a docker mount
+- stat:
+    path: /etc/dnsmasq.conf
+  register: p
+
+- name: create empty /etc/dnsmasq.conf file
+  file:
+    path: /etc/dnsmasq.conf
+    state: touch
+  when: p.stat.exists is defined and not p.stat.exists
+
+- name: resolv.conf with provisioners
+  template:
+    src: resolv.conf.j2
+    dest: "/etc/resolv.conf"
+
+- name: create dnsmasq config directory
+  file: path=/etc/dnsmasq state=directory
+
+- name: Create tftpboot dir
+  file:
+    path: /var/lib/tftpboot
+    state: directory
+
+- name: copy ipxe undionly.kpxe
+  copy:
+    src: undionly.kpxe
+    dest: /var/lib/tftpboot/undionly.kpxe
+
+- name: copy ipxe ipxe.efi
+  copy:
+    src: ipxe.efi
+    dest: /var/lib/tftpboot/ipxe.efi
+
+- name: copy dnsmasq.conf
+  template:
+    src: dnsmasq.conf.j2
+    dest: /etc/dnsmasq.conf
+
+
+- name: Dnsmasq systemd unit
+  template:
+    src: dnsmasq.service.j2
+    dest: "/etc/systemd/system/dnsmasq.service"
+  register: dnsmasq_unit
+  notify:
+    - reload systemd
+
+- name: Restart dnsmasq service
+  systemd:
+    daemon_reload: yes
+    name: dnsmasq.service
+    enabled: yes
+    state: restarted
+    masked: no
+  when: dnsmasq_unit.changed
+  notify:
+    - restart dnsmasq
+    - is dnsmasq active
+
+- name: Start service dnsmasq, if not started
+  service:
+    name: dnsmasq
+    state: started

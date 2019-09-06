@@ -1,0 +1,40 @@
+---
+- name: restart systemd-resolved
+  systemd:
+    name: systemd-resolved
+    state: restarted
+    daemon_reload: yes
+
+- name: restart dnsmasq
+  systemd:
+    name: dnsmasq
+    state: restarted
+    masked: no
+    daemon_reload: yes
+
+- name: is dnsmasq active
+  command: systemctl is-active dnsmasq
+  register: dnsmasq_active
+  failed_when: "'active' not in dnsmasq_active.stdout"
+
+- name: restart matchbox
+  systemd:
+    name: matchbox
+    state: restarted
+    daemon_reload: yes
+
+- name: is matchbox active
+  command: systemctl is-active matchbox
+  register: matchbox_active
+  failed_when: "'active' not in matchbox_active.stdout"
+
+- name: reload systemd
+  command: systemctl daemon-reload
+
+- name: save iptables
+  shell: netfilter-persistent save
+  listen: persist iptables
+
+- name: reload iptables
+  shell: netfilter-persistent reload
+  listen: persist iptables

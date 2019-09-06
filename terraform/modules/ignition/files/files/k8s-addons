@@ -1,0 +1,25 @@
+#!/bin/bash -x
+
+export KUBECONFIG=/etc/kubernetes/kubeconfig
+kubectl="/opt/kubernetes/bin/kubectl"
+
+echo "Waiting for Kubernetes API..."
+until $kubectl version >/dev/null 2>&1
+do
+    sleep 5
+done
+
+rc=0
+for file in /opt/kubernetes/addons/*/*; do
+   temp=$(/usr/bin/mktemp)
+   $kubectl create -f $file > $temp 2>&1
+   if [ $? -ne 0 ]; then
+       if ! /usr/bin/grep -q AlreadyExists $temp; then
+           cat $temp
+           rc=1
+       fi
+   fi
+   /usr/bin/rm $temp
+done
+
+exit $rc

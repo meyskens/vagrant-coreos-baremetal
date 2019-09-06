@@ -1,0 +1,80 @@
+---
+- name: Create matchbox assets dir
+  file:
+    path: /var/lib/matchbox/assets
+    state: directory
+
+- name: Create matchbox coreos assets dir
+  file:
+    path: /var/lib/matchbox/assets/coreos/2135.4.0
+    state: directory
+
+- name: Create previous matchbox coreos assets dir
+  file:
+    path: /var/lib/matchbox/assets/coreos/1967.6.0
+    state: directory
+
+- name: check if coreos_production_pxe file exists
+  stat: 
+    path: /var/lib/matchbox/assets/coreos/1967.6.0/coreos_production_pxe.vmlinuz
+  register: coreos_production_pxe_vmlinuz
+
+- name: download previous coreos_production_pxe.vmlinuz
+  get_url:
+    url:  https://stable.release.core-os.net/amd64-usr/1967.6.0/coreos_production_pxe.vmlinuz
+    dest: /var/lib/matchbox/assets/coreos/1967.6.0/
+    timeout: 1000 # 10 second defaukt is just too short for local
+  when: coreos_production_pxe_vmlinuz.stat.exists == False
+
+- name: check if coreos_production_pxe_image.cpio.gz file exists
+  stat: 
+    path: /var/lib/matchbox/assets/coreos/1967.6.0/coreos_production_pxe_image.cpio.gz
+  register: coreos_production_pxe_image_cpio_gz
+
+- name: download previous coreos_production_pxe_image.cpio.gz
+  get_url:
+    url:  https://stable.release.core-os.net/amd64-usr/1967.6.0/coreos_production_pxe_image.cpio.gz
+    dest: /var/lib/matchbox/assets/coreos/1967.6.0/
+    timeout: 1000 # 10 second defaukt is just too short for local
+  when: coreos_production_pxe_image_cpio_gz.stat.exists == False
+
+- name: Create matchbox config dir
+  file:
+    path: /etc/matchbox
+    state: directory
+
+- name: Matchbox systemd unit
+  template:
+    src: matchbox.service.j2
+    dest: "/etc/systemd/system/matchbox.service"
+  register: matchbox_unit
+
+- name: Matchbox certs
+  copy:
+    src: "{{ item }}"
+    dest: /etc/matchbox
+    owner: root
+    mode: 0600
+  register: matchbox_certs
+  with_fileglob:
+    - "server.*"
+    - "ca.crt"
+
+- name: Make sure matchbox starts on boot
+  service:
+    name: matchbox
+    enabled: yes
+
+- name: Make sure matchbox is running
+  service:
+    name: matchbox
+    state: started
+
+- name: Restart matchbox service
+  service:
+    name: matchbox
+    state: restarted
+  when: matchbox_unit.changed or matchbox_certs.changed
+  notify:
+    - restart matchbox
+    - is matchbox active
