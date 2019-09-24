@@ -24,13 +24,14 @@ The controllers will start a kubernetes and etcd cluster, note that there is no 
 You need:
 * Vagrant
 * Virtualbox 5+ (only Virtualbox is supported for now)
+* VirtualBox Extension Pack (for PXE support)
 * A copy of this repo
 
 Install the PXE boot Vagrant box:
 ```
 ~$ vagrant box add pxe-boot-3-disk pxe-boot-3-disk.box
 ```
-This box contains an empty VM configured to boot PXE and has 3 500GB (empty) SATA disks connected.
+This box contains an empty VM configured to boot PXE and has 3 500GB (empty) SATA disks connected. Which was created as an empty Virtualbox VM with PXE configured using the VirtualBox Extension Pack and packed using [vagrant package](https://www.vagrantup.com/docs/virtualbox/boxes.html).
 
 Run the VM:
 ```
