@@ -1,11 +1,11 @@
 # Vagrant CoreOS baremetal
 This repository contains everything to set up a CoreOS Kubernetes cluster in Virtualbox using Vagrant just the same way as is done in the baremetal clusters at source{d}.
-This is meant to be a playground to experiment with changes to the changes to setup of the baremetal clusters without having to deploy it on actual machines. The setup is as much the same as the production setup as possible. There are security compromised made (set passwords, private keys exposed) in this setup to make it easy to set up, you should *never* use these files to set up a production cluster without modifications.
+This is meant to be a playground to experiment with changes to the setup of baremetal clusters without having to deploy it on actual machines. The setup is as much the same as a production setup as possible. There are security compromises made (set passwords, private keys exposed) in this setup to make it easy to set up, you should *never* use these files to set up a production cluster without modifications.
 
 ## Structure
-There are 2 types of machines, the Provisioner will serve DHCP and Ignition configuration (via Matchbox), it also is responsible for running all sripts to set up the systems. This one runs Ubuntu 18.04. In this setup it also acts as a NAT router between the Virtualbox NAT and the internal PXE network.
-The controllers will boot from the PXE profie served through the provisiner, the controllers only have an interface to the PXE network with a fixed MAC.
-The controllers will start a Kunernetes and etcd cluster, note that there is no presistant disks set up by default so all data is stored in RAM. There are 3 disks in the VM which are used to experiment with RAID setups and disk partitioning.
+There are 2 types of machines, the Provisioner will serve DHCP and Ignition configuration (via Matchbox), it also is responsible for running all scripts to set up the systems. This one runs Ubuntu 18.04. In this setup it also acts as a NAT router between the Virtualbox NAT and the internal PXE network.
+The controllers will boot from the PXE profile served through the provisioner, the controllers only have an interface to the PXE network with a fixed MAC.
+The controllers will start a kubernetes and etcd cluster, note that there is no persistent disks set up by default so all data is stored in RAM. There are 3 disks in the VM which are used to experiment with RAID setups and disk partitioning.
 
 
 ```
