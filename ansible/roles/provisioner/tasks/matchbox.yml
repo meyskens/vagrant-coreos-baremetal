@@ -4,11 +4,6 @@
     path: /var/lib/matchbox/assets
     state: directory
 
-- name: Create matchbox coreos assets dir
-  file:
-    path: /var/lib/matchbox/assets/coreos/2135.4.0
-    state: directory
-
 - name: Create previous matchbox coreos assets dir
   file:
     path: /var/lib/matchbox/assets/coreos/1967.6.0

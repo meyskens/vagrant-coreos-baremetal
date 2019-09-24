@@ -1,4 +1,4 @@
-- name: NAT
+- name: Set up interfaces to forward traffic from internal to external
   iptables:
     action: append
     chain: FORWARD
@@ -10,7 +10,7 @@
     jump: ACCEPT
   notify: persist iptables
     
-- name: NAT
+- name: Setup forward chain for traffic from internal to external
   iptables:
     action: append
     chain: FORWARD
@@ -19,7 +19,7 @@
     jump: ACCEPT
   notify: persist iptables
 
-- name: Flush nat rules
+- name: Flush NAT rules
   iptables:
     table: nat
     chain: POSTROUTING
