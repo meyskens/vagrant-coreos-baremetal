@@ -18,7 +18,7 @@
   get_url:
     url:  https://stable.release.core-os.net/amd64-usr/1967.6.0/coreos_production_pxe.vmlinuz
     dest: /var/lib/matchbox/assets/coreos/1967.6.0/
-    timeout: 1000 # 10 second defaukt is just too short for local
+    timeout: 1000 # 10 second default is just too short for local
   when: coreos_production_pxe_vmlinuz.stat.exists == False
 
 - name: check if coreos_production_pxe_image.cpio.gz file exists
