@@ -28,11 +28,7 @@ You need:
 * A copy of this repo
 * Enough memory to run the VMs (1GB for the provisioner, 2GB per controller)
 
-Install the PXE boot Vagrant box:
-```
-~$ vagrant box add pxe-boot-3-disk pxe-boot-3-disk.box
-```
-This box contains an empty VM configured to boot PXE and has 3 500GB (empty) SATA disks connected. Which was created as an empty Virtualbox VM with PXE configured using the VirtualBox Extension Pack and packed using [vagrant package](https://www.vagrantup.com/docs/virtualbox/boxes.html).
+This repository contains a box contains which an empty VM configured to boot PXE and has 3 500GB (empty) SATA disks connected as well as 1 100GB disk which is formatted ext4 for CoreOS to install itself on. Which was created as an empty Virtualbox VM with PXE configured using the VirtualBox Extension Pack and packed using [vagrant package](https://www.vagrantup.com/docs/virtualbox/boxes.html). The boot disk is added for for allowing this setup to work on a single machine and is not present in production environments usually.
 
 Run the VM:
 ```
