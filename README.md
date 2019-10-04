@@ -26,6 +26,7 @@ You need:
 * Virtualbox 5+ (only Virtualbox is supported for now)
 * VirtualBox Extension Pack (for PXE support)
 * A copy of this repo
+* Enough memory to run the VMs (1GB for the provisioner, 2GB per controller)
 
 Install the PXE boot Vagrant box:
 ```
