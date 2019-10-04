@@ -20,6 +20,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     provisioner.vm.network "private_network", ip: "192.168.1.1", virtualbox__intnet: "pxe_network"
 
     provisioner.vm.provision "shell",
+      inline: "sudo apt-get update"
+
+    provisioner.vm.provision "shell",
       inline: "sudo apt-get install -y python-netaddr"
 
     provisioner.vm.provision "ansible_local" do |ansible|
@@ -43,7 +46,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   (1..NUM_CONTROLLERS).each do |i|
     config.vm.define "controller-#{i}" do |node|
-      node.vm.box = "pxe-boot-3-disk"
+      node.vm.box = "pxe-boot-3-disk-coreosdisk.box"
       node.vm.hostname = nil
       node.vm.synced_folder '.', '/vagrant', disabled: true
       node.vm.network "private_network", type: "dhcp", virtualbox__intnet: "pxe_network", auto_config: false

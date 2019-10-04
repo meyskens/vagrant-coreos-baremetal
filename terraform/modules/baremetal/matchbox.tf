@@ -19,6 +19,7 @@ resource "matchbox_profile" "controllers" {
     "coreos.first_boot=yes",
     "console=tty0",
     "initrd=coreos_production_pxe_image.cpio.gz",
+    "root=/dev/sda1",
   ]
 
   raw_ignition = "${element(data.ignition_config.controller.*.rendered, count.index)}"
