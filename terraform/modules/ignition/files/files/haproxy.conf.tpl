@@ -33,7 +33,7 @@ frontend k8s-api
   bind *:${haproxy_apiserver_port}
   mode tcp
   option tcplog
-  acl network_allowed src 10.0.0.0/8
+  acl network_allowed src 192.168.1.0/24
   tcp-request connection reject if !network_allowed
   tcp-request inspect-delay 5s
   default_backend k8s-api
