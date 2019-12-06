@@ -1,0 +1,11 @@
+[Unit]
+Description=Wait for etcd cluster to be ready
+Wants=etcd-member.service
+Before=bootkube.service
+[Service]
+Type=oneshot
+RemainAfterExit=true
+Environment="ETCDCTL_API=3"
+ExecStart=/bin/sh -c 'while ! /usr/bin/etcdctl --endpoints https://127.0.0.1:2379 --cacert /etc/ssl/etcd/etcd-client-ca.crt --cert /etc/ssl/etcd/etcd-client.crt --key /etc/ssl/etcd/etcd-client.key endpoint health; do sleep 1; done'
+[Install]
+RequiredBy=bootkube.service

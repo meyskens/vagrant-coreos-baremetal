@@ -1,0 +1,38 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=dnsmasq service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+TimeoutStartSec=20m
+ExecStart=/usr/sbin/dnsmasq \
+    --keep-in-foreground \
+    --interface enp0s8 \
+    --log-facility=- \
+    --log-queries=extra \
+    --log-dhcp \
+    --no-resolv \
+    --server=8.8.8.8 \
+    --server=8.8.4.4 \
+    --enable-tftp \
+    --tftp-root=/var/lib/tftpboot \
+    --tftp-no-blocksize \
+    --dhcp-match=set:legacy,option:client-arch,0 \
+    --dhcp-match=set:efi-64,option:client-arch,7 \
+    --dhcp-boot=tag:efi-64,tag:!ipxe,ipxe.efi \
+    --dhcp-boot=tag:legacy,tag:!ipxe,undionly.kpxe \
+    --dhcp-userclass=set:ipxe,iPXE \
+    --dhcp-boot=tag:#ipxe,undionly.kpxe \
+    --dhcp-boot=tag:ipxe,http://{{ hostvars[inventory_hostname].internal_ip }}:8080/boot.ipxe \
+    --dhcp-range={{ dhcp_range }},30m \
+    --dhcp-option=6,{{ hostvars[inventory_hostname].internal_ip }} \
+    --dhcp-option=3,{{ hostvars[inventory_hostname].internal_ip }} \
+    --address=/{{ hostvars[inventory_hostname].internal_ip }}/ \
+    --ptr-record={{ hostvars[inventory_hostname].internal_ip | ipaddr('revdns') }},{{ hostvars[inventory_hostname].ansible_fqdn }} \
+    --domain=k8s.box.srcd.local \
+    --local-ttl=30
+
+[Install]
+WantedBy=multi-user.target

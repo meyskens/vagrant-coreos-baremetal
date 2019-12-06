@@ -1,0 +1,2 @@
+- name: Install dnsmasq
+  apt: name=dnsmasq state=present

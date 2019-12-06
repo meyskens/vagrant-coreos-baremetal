@@ -1,0 +1,7 @@
+- include_tasks: packages.yml
+  tags:
+    - packages
+
+- include_tasks: docker.yml
+  tags:
+    - docker

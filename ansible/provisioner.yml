@@ -1,0 +1,5 @@
+- name: Vagrant Provisioner servers
+  hosts: all
+  roles:
+    - common
+    - provisioner

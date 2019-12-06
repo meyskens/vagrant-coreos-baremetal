@@ -1,0 +1,6 @@
+- name: Make sure docker is enabled and running
+  service:
+    state: started
+    name: docker
+    enabled: yes
+    use: service # use this or enabled won't work

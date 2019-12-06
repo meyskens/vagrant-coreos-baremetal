@@ -1,0 +1,17 @@
+[Unit]
+Description=Bootstrap a Kubernetes control plane with a temp api-server
+ConditionPathExists=!/data/bootkube/init_bootkube.done
+[Service]
+Environment="ETCDCTL_API=3"
+Type=oneshot
+RemainAfterExit=true
+WorkingDirectory=/opt/bootkube
+ExecStart=/usr/bin/etcdctl \
+  --endpoints https://127.0.0.1:2379 \
+  --cacert /etc/ssl/etcd/etcd-client-ca.crt \
+  --cert /etc/ssl/etcd/etcd-client.crt \
+  --key /etc/ssl/etcd/etcd-client.key \
+    lock bootkube-lock -- /opt/bootkube/bootkube-start
+ExecStartPost=/bin/sh -c "/bin/mkdir /data/bootkube; /bin/touch /data/bootkube/init_bootkube.done"
+[Install]
+WantedBy=multi-user.target

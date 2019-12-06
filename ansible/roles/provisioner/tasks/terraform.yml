@@ -1,0 +1,43 @@
+- name: Create terraform dir
+  file:
+    path: /opt/terraform/
+    state: directory
+
+- name: Download terraform archive Linux 64 bits
+  get_url:
+    url: https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip
+    dest: /tmp/terraform-{{terraform_version}}.zip
+
+- name: Unarchive Terraform archive
+  unarchive:
+    src: /tmp/terraform-{{terraform_version}}.zip
+    dest: /opt/terraform/
+    copy: no
+
+- name: Adding terraform command to user path
+  file: 
+    src: /opt/terraform/terraform
+    dest: /usr/bin/terraform
+    state: link
+
+- name: Create terraform plugins dir
+  file:
+    path: /root/.terraform.d/plugins/linux_amd64/
+    state: directory
+
+- name: Download terraform matchbox provider
+  get_url:
+    url: https://github.com/poseidon/terraform-provider-matchbox/releases/download/v0.3.0/terraform-provider-matchbox-v0.3.0-linux-amd64.tar.gz
+    dest: /tmp/terraform-provider-matchbox-v0.3.0-linux-amd64.tar.gz
+ 
+- name: Unarchive Terraform matchbox archive
+  unarchive:
+    src: /tmp/terraform-provider-matchbox-v0.3.0-linux-amd64.tar.gz
+    dest: /tmp/
+    copy: no
+
+- name: Adding terraform matchbox provider to the correct path
+  file: 
+    src: /tmp/terraform-provider-matchbox-v0.3.0-linux-amd64/terraform-provider-matchbox
+    dest: /root/.terraform.d/plugins/linux_amd64/terraform-provider-matchbox_v0.3.0
+    state: link

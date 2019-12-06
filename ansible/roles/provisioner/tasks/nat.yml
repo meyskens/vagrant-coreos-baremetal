@@ -1,0 +1,62 @@
+- name: Set up interfaces to forward traffic from internal to external
+  iptables:
+    action: append
+    chain: FORWARD
+    in_interface: "enp0s8"
+    out_interface: "enp0s3"
+    source: "192.168.1.0/24"
+    match: conntrack
+    ctstate: NEW
+    jump: ACCEPT
+  notify: persist iptables
+    
+- name: Setup forward chain for traffic from internal to external
+  iptables:
+    action: append
+    chain: FORWARD
+    match: conntrack
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+  notify: persist iptables
+
+- name: Flush NAT rules
+  iptables:
+    table: nat
+    chain: POSTROUTING
+    flush: yes
+  notify: persist iptables
+
+- name: Add NAT rules
+  iptables:
+    table: nat
+    action: append
+    chain: POSTROUTING
+    out_interface: "enp0s3"
+    jump: MASQUERADE
+  notify: persist iptables
+
+- name: Enable forwarding now
+  copy:
+    content: "1\n"
+    dest: /proc/sys/net/ipv4/ip_forward
+
+- name: Enable forwarding after reboot
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+
+- name: SSH Forward systemd unit
+  template:
+    src: ssh-forward@.service.j2
+    dest: "/etc/systemd/system/ssh-forward@.service"
+
+- name: Start SSH forward services
+  systemd:
+    daemon_reload: yes
+    name: ssh-forward@{{ ((item | int) + 10 )| string }}.service
+    enabled: yes
+    state: restarted
+    masked: no
+  with_sequence: start=1 end={{ num_controllers }}
+

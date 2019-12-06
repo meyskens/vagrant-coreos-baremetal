@@ -1,0 +1,5 @@
+*filter
+-A INPUT -i external0 -m state --state ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -i external0 -p icmp --icmp-type echo-request -j ACCEPT
+-A INPUT -i external0 -j DROP
+COMMIT
